@@ -2,6 +2,7 @@ from flask import Flask, jsonify, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Boolean
+import random
 
 app = Flask(__name__)
 
@@ -40,6 +41,25 @@ with app.app_context():
 def home():
     return render_template("index.html")
 
+
+@app.route("/random", methods=['GET'])
+def get_random_cafe():
+    with app.app_context():
+        result = db.session.execute(db.select(Cafe))
+        all_cafes = result.scalars().all()
+        random_cafe = random.choice(all_cafes)
+        return jsonify(cafe={
+            "name": random_cafe.name,
+            "map": random_cafe.map_url,
+            "image": random_cafe.img_url,
+            "location": random_cafe.location,
+            "seats": random_cafe.seats,
+            "has_toilet": random_cafe.has_toilet,
+            "has_wifi": random_cafe.has_wifi,
+            "has_sockets": random_cafe.has_sockets,
+            "can_take_calls": random_cafe.can_take_calls,
+            "coffee_price": random_cafe.coffee_price,
+        })
 
 # HTTP GET - Read Record
 
