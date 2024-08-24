@@ -45,22 +45,21 @@ def home():
 # HTTP GET - Read Record
 @app.route("/random", methods=['GET'])
 def get_random_cafe():
-    with app.app_context():
-        result = db.session.execute(db.select(Cafe))
-        all_cafes = result.scalars().all()
-        random_cafe = random.choice(all_cafes)
-        return jsonify(cafe={
-            "name": random_cafe.name,
-            "map": random_cafe.map_url,
-            "image": random_cafe.img_url,
-            "location": random_cafe.location,
-            "seats": random_cafe.seats,
-            "has_toilet": random_cafe.has_toilet,
-            "has_wifi": random_cafe.has_wifi,
-            "has_sockets": random_cafe.has_sockets,
-            "can_take_calls": random_cafe.can_take_calls,
-            "coffee_price": random_cafe.coffee_price,
-        })
+    result = db.session.execute(db.select(Cafe))
+    all_cafes = result.scalars().all()
+    random_cafe = random.choice(all_cafes)
+    return jsonify(cafe={
+        "name": random_cafe.name,
+        "map": random_cafe.map_url,
+        "image": random_cafe.img_url,
+        "location": random_cafe.location,
+        "seats": random_cafe.seats,
+        "has_toilet": random_cafe.has_toilet,
+        "has_wifi": random_cafe.has_wifi,
+        "has_sockets": random_cafe.has_sockets,
+        "can_take_calls": random_cafe.can_take_calls,
+        "coffee_price": random_cafe.coffee_price,
+    })
 
 
 @app.route("/all", methods=['GET'])
@@ -83,6 +82,30 @@ def get_all_cafes():
         }
         list_of_cafes["cafes"].append(cafe)
     return jsonify(list_of_cafes)
+
+
+@app.route("/search", methods=['GET', 'POST'])
+def search_cafes():
+    location = request.args.get("loc")
+    if location:
+        result = db.session.execute(db.select(Cafe).where(Cafe.location == location))
+        all_cafes = result.scalars().all()
+        list_of_cafes = {"cafes": []}
+        for each_cafe in all_cafes:
+            cafe = {
+                "name": each_cafe.name,
+                "map": each_cafe.map_url,
+                "image": each_cafe.img_url,
+                "location": each_cafe.location,
+                "seats": each_cafe.seats,
+                "has_toilet": each_cafe.has_toilet,
+                "has_wifi": each_cafe.has_wifi,
+                "has_sockets": each_cafe.has_sockets,
+                "can_take_calls": each_cafe.can_take_calls,
+                "coffee_price": each_cafe.coffee_price,
+            }
+            list_of_cafes["cafes"].append(cafe)
+        return jsonify(list_of_cafes)
 
 # HTTP POST - Create Record
 
