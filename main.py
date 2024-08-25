@@ -87,9 +87,9 @@ def get_all_cafes():
 @app.route("/search", methods=['GET', 'POST'])
 def search_cafes():
     location = request.args.get("loc")
-    if location:
-        result = db.session.execute(db.select(Cafe).where(Cafe.location == location))
-        all_cafes = result.scalars().all()
+    result = db.session.execute(db.select(Cafe).where(Cafe.location == location))
+    all_cafes = result.scalars().all()
+    if all_cafes:
         list_of_cafes = {"cafes": []}
         for each_cafe in all_cafes:
             cafe = {
@@ -106,7 +106,8 @@ def search_cafes():
             }
             list_of_cafes["cafes"].append(cafe)
         return jsonify(list_of_cafes)
-
+    else:
+        return jsonify(error={"Not Found": "Sorry, we don't have a cafe at that location."})
 # HTTP POST - Create Record
 
 # HTTP PUT/PATCH - Update Record
